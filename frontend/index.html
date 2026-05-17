@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VocalCode</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Title bar -->
+  <header class="titlebar" role="banner">
+    <div class="titlebar-left">
+      <span class="logo">
+        <span class="logo-dot" aria-hidden="true">⬤</span> VocalCode
+      </span>
+    </div>
+    <div class="titlebar-center">
+      <span id="status-text" class="status-text" aria-live="polite" role="status">Ready</span>
+    </div>
+    <div class="titlebar-right">
+      <button id="mute-btn" class="icon-btn" aria-label="Mute text-to-speech" title="Toggle TTS (M)">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Transcript bar -->
+  <div class="transcript-bar" role="region" aria-label="Speech transcript">
+    <span class="transcript-label" aria-hidden="true">Transcript</span>
+    <span id="transcript-display" aria-live="polite" aria-atomic="true"></span>
+    <span id="transcript-placeholder" class="placeholder">Press Record and start speaking...</span>
+  </div>
+
+  <!-- Main workspace -->
+  <main class="workspace" role="main">
+
+    <!-- Code editor panel -->
+    <section class="panel editor-panel" aria-label="Code editor">
+      <div class="panel-header">
+        <span class="panel-title">
+          <span aria-hidden="true">🐍</span> Python
+        </span>
+        <div class="panel-actions">
+          <button id="copy-btn" class="panel-btn" aria-label="Copy code to clipboard" disabled>Copy</button>
+          <button id="clear-btn" class="panel-btn" aria-label="Clear editor" disabled>Clear</button>
+        </div>
+      </div>
+      <div class="editor-scroll">
+        <pre id="code-pre"><code id="code-display" class="language-python"></code></pre>
+        <div id="editor-placeholder" class="editor-placeholder" aria-hidden="true">
+          <div class="placeholder-icon" aria-hidden="true">🎤</div>
+          <p>Record a voice command to generate Python code</p>
+          <p class="hint">
+            <kbd>R</kbd> Record &nbsp;·&nbsp;
+            <kbd>Space</kbd> Run &nbsp;·&nbsp;
+            <kbd>M</kbd> Mute
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Terminal panel -->
+    <section class="panel terminal-panel" aria-label="Terminal output">
+      <div class="panel-header">
+        <span class="panel-title">
+          <span aria-hidden="true">⬛</span> Terminal
+        </span>
+        <button id="clear-terminal-btn" class="panel-btn" aria-label="Clear terminal output">Clear</button>
+      </div>
+      <div id="terminal-output" class="terminal-scroll" aria-live="polite" aria-atomic="false" role="log">
+        <div class="terminal-placeholder">Execution output will appear here...</div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Control bar (status bar) -->
+  <footer class="controlbar" role="contentinfo">
+    <div class="controlbar-left">
+      <span id="status-dot" class="status-dot idle" aria-hidden="true"></span>
+      <span id="status-label" class="status-label">Idle</span>
+      <span id="meta-text" class="meta-text"></span>
+    </div>
+
+    <div class="controlbar-center">
+      <button id="record-btn" class="record-btn" aria-label="Start recording (R)" title="Record (R)">
+        <span class="record-icon" aria-hidden="true"></span>
+        <span class="record-text">Record</span>
+      </button>
+      <button id="run-btn" class="run-btn" aria-label="Run code (Space)" title="Run (Space)" disabled>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        Run
+      </button>
+    </div>
+
+    <div class="controlbar-right">
+      <button id="replay-btn" class="icon-btn" aria-label="Replay last audio" title="Replay TTS" disabled>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+          <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+        </svg>
+      </button>
+    </div>
+  </footer>
+
+  <!-- Toast container -->
+  <div id="toast-container" aria-live="assertive" aria-atomic="true"></div>
+
+  <!-- Debug retry overlay -->
+  <div id="debug-overlay" class="debug-overlay" hidden aria-hidden="true">
+    <div class="debug-spinner" aria-hidden="true"></div>
+    <span id="debug-label">Fixing error...</span>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+services:
+
+  # ── Frontend ────────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── Backend ─────────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    env_file: .env                         # loads OLLAMA_MODEL, SANDBOX_* etc.
+    environment:
+      # Override localhost values with Docker-network-aware addresses
+      - ASR_SERVICE_URL=http://asr:8001
+      # Ollama runs on the host machine; host.docker.internal resolves via extra_hosts below
+      - OLLAMA_HOST=http://host.docker.internal:11434
+    extra_hosts:
+      # Makes host.docker.internal work on Linux (no-op on Docker Desktop)
+      - "host.docker.internal:host-gateway"
+    volumes:
+      # Expose the host Docker socket so the executor can launch sandbox containers
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - asr
+    restart: unless-stopped
+
+  # ── ASR microservice (sherpa-onnx, GPU) ─────────────────────────────────────
+  asr:
+    build:
+      context: ./asr
+      dockerfile: Dockerfile
+    image: sherpa-asr:cuda12
+    container_name: sherpa-asr
+    ports:
+      - "8001:8001"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            # Remove this block (or set ASR_PROVIDER=cpu below) if you have no NVIDIA GPU
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - ASR_PROVIDER=cuda      # set to "cpu" on machines without a GPU
+      - ASR_THREADS=4
+      - MODEL_DIR=/opt/sherpa-onnx/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20
+    volumes:
+      - ./asr/audio:/workspace/audio
+    ipc: host
+    restart: unless-stopped

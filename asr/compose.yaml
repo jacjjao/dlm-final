@@ -1,0 +1,33 @@
+services:
+  sherpa-asr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sherpa-asr:cuda12
+    container_name: sherpa-asr
+
+    ports:
+      - "8001:8001"
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      # "cuda" uses the GPU-enabled ONNX runtime; set to "cpu" if no GPU
+      - ASR_PROVIDER=cuda
+      - ASR_THREADS=4
+      - MODEL_DIR=/opt/sherpa-onnx/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20
+
+    volumes:
+      # Mount a local directory to drop test audio files into
+      - ./audio:/workspace/audio
+
+    ipc: host
+    restart: unless-stopped

@@ -1,0 +1,10 @@
+# Test audio files (volume-mounted at runtime)
+audio/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Git
+.git/
+.gitignore

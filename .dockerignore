@@ -1,0 +1,24 @@
+# Git history
+.git/
+.gitignore
+
+# Environment files
+.env
+.env.local
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Claude Code
+.claude/
+
+# Docs / planning
+PLAN.md
+README.md
+
+# ASR service (not needed for backend/frontend builds)
+asr/
+
+# Sandbox service
+sandbox/

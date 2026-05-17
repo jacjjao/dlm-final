@@ -1,0 +1,42 @@
+# Environment variables — never commit real secrets
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Logs
+*.log
+logs/
+
+# Docker build artifacts
+.docker/
+
+# ASR audio test files (volume-mounted at runtime); keep the dir itself
+asr/audio/*
+!asr/audio/.gitkeep
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
