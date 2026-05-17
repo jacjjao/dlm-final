@@ -24,12 +24,16 @@ vocalcode/
 ├── frontend/
 │   ├── index.html          # 主頁面
 │   ├── style.css           # 樣式（高對比、WCAG 無障礙）
-│   └── js/
-│       ├── main.js         # 應用程式進入點
-│       ├── recorder.js     # 麥克風錄音 / Web Audio API
-│       ├── editor.js       # 程式碼編輯器控制
-│       ├── tts.js          # 文字轉語音（Web Speech API）
-│       └── api.js          # 與後端溝通的 fetch 封裝
+│   ├── package.json        # devDependency: typescript
+│   ├── tsconfig.json       # strict, noImplicitAny, outDir: ./js
+│   ├── ts/                 # TypeScript 原始碼（source of truth）
+│   │   ├── globals.d.ts    # hljs CDN 全域型別宣告
+│   │   ├── main.ts         # 應用程式進入點
+│   │   ├── recorder.ts     # 麥克風錄音 / Web Audio API
+│   │   ├── editor.ts       # 程式碼編輯器控制
+│   │   ├── tts.ts          # 文字轉語音（Web Speech API）
+│   │   └── api.ts          # 型別化 fetch 封裝 + response interface
+│   └── js/                 # tsc 編譯輸出（gitignore，Docker 自動生成）
 │
 ├── backend/
 │   ├── app.py              # FastAPI 主程式 / 路由
@@ -42,9 +46,11 @@ vocalcode/
 │   └── Dockerfile          # 隔離的程式碼執行環境
 │
 ├── tests/
-│   ├── test_asr.py
-│   ├── test_llm.py
-│   └── test_executor.py
+│   ├── Dockerfile          # 測試執行環境（python:3.12-slim）
+│   ├── test_api.py         # FastAPI 端點整合測試
+│   ├── test_asr.py         # ASR proxy 單元測試
+│   ├── test_llm.py         # LLM 生成 / 除錯單元測試
+│   └── test_executor.py    # 沙盒執行單元測試
 │
 ├── .env.example            # API 金鑰範本
 ├── requirements.txt
@@ -103,7 +109,9 @@ vocalcode/
 - `aria-live` 區域同步狀態給螢幕閱讀器
 - 焦點順序邏輯清晰
 
-**錄音流程（`recorder.js`）**
+**語言**：TypeScript（strict mode，`noImplicitAny`），由 `tsc` 編譯至 `js/`，Docker build 時自動執行。
+
+**錄音流程（`recorder.ts`）**
 ```
 getUserMedia() → MediaRecorder → ondataavailable
 → Blob (audio/webm) → FormData → POST /transcribe

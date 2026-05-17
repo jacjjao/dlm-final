@@ -1,11 +1,13 @@
 export class TTS {
+  private readonly _synth: SpeechSynthesis;
+  private _muted: boolean = false;
+  private _lastText: string = '';
+
   constructor() {
     this._synth = window.speechSynthesis;
-    this._muted = false;
-    this._lastText = '';
   }
 
-  speak(text) {
+  speak(text: string): void {
     this._lastText = text;
     if (this._muted || !text) return;
 
@@ -18,26 +20,25 @@ export class TTS {
     this._synth.speak(utterance);
   }
 
-  stop() {
+  stop(): void {
     this._synth.cancel();
   }
 
-  replay() {
+  replay(): void {
     if (this._lastText) this.speak(this._lastText);
   }
 
-  /** Toggle mute. Returns the new muted state. */
-  toggleMute() {
+  toggleMute(): boolean {
     this._muted = !this._muted;
     if (this._muted) this.stop();
     return this._muted;
   }
 
-  get isMuted() {
+  get isMuted(): boolean {
     return this._muted;
   }
 
-  get hasLastText() {
+  get hasLastText(): boolean {
     return Boolean(this._lastText);
   }
 }
