@@ -1,9 +1,9 @@
 """
-sherpa-onnx inference wrapper.
+sherpa-onnx inference wrapper — FireRed ASR2 (offline, int8 quantised).
 
-The Transcriber class is initialised once at server startup and shared across
-requests.  Each call to transcribe() creates an independent stream, so
-concurrent requests are safe without additional locking.
+Uses OfflineRecognizer instead of the old streaming zipformer so the full
+audio clip is decoded in one pass, which gives better accuracy on short
+voice commands received as uploaded files.
 """
 
 import os
@@ -14,48 +14,37 @@ import sherpa_onnx
 
 _MODEL_BASE = (
     "/opt/sherpa-onnx/"
-    "sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20"
+    "sherpa-onnx-fire-red-asr2-zh_en-int8-2026-02-26"
 )
 
 MODEL_DIR = os.getenv("MODEL_DIR", _MODEL_BASE)
-PROVIDER  = os.getenv("ASR_PROVIDER", "cuda")   # "cuda" | "cpu" | "coreml"
+PROVIDER  = os.getenv("ASR_PROVIDER", "cuda")   # "cuda" | "cpu"
 N_THREADS = int(os.getenv("ASR_THREADS", "4"))
-
-# Silence appended after the utterance to flush the encoder's look-ahead buffer
-_TAIL_SECS = 0.5
 
 
 class Transcriber:
     def __init__(self) -> None:
-        self._rec = sherpa_onnx.OnlineRecognizer.from_transducer(
-            tokens  = f"{MODEL_DIR}/tokens.txt",
-            encoder = f"{MODEL_DIR}/encoder-epoch-99-avg-1.onnx",
-            decoder = f"{MODEL_DIR}/decoder-epoch-99-avg-1.onnx",
-            joiner  = f"{MODEL_DIR}/joiner-epoch-99-avg-1.onnx",
-            num_threads     = N_THREADS,
-            sample_rate     = 16000,
-            feature_dim     = 80,
-            decoding_method = "greedy_search",
-            provider        = PROVIDER,
+        self._rec = sherpa_onnx.OfflineRecognizer(
+            sherpa_onnx.OfflineRecognizerConfig(
+                model=sherpa_onnx.OfflineModelConfig(
+                    fire_red_asr=sherpa_onnx.OfflineFireRedAsrModelConfig(
+                        encoder=f"{MODEL_DIR}/encoder.int8.onnx",
+                        decoder=f"{MODEL_DIR}/decoder.int8.onnx",
+                    ),
+                    tokens=f"{MODEL_DIR}/tokens.txt",
+                    num_threads=N_THREADS,
+                    provider=PROVIDER,
+                ),
+            )
         )
 
     def transcribe(self, wav_path: str) -> str:
         """Return the recognised text for a 16 kHz mono WAV file."""
         samples = _read_wav(wav_path)
-
         stream = self._rec.create_stream()
         stream.accept_waveform(16000, samples)
-
-        tail = np.zeros(int(_TAIL_SECS * 16000), dtype=np.float32)
-        stream.accept_waveform(16000, tail)
-        stream.input_finished()
-
-        while self._rec.is_ready(stream):
-            self._rec.decode_stream(stream)
-
-        result = self._rec.get_result(stream)
-        text = result.text if hasattr(result, "text") else result
-        return text.strip()
+        self._rec.decode_stream(stream)
+        return stream.result.text.strip()
 
 
 def _read_wav(path: str) -> np.ndarray:

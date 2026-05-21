@@ -21,10 +21,13 @@ RUN git clone https://github.com/k2-fsa/sherpa-onnx && \
 
 WORKDIR /opt/sherpa-onnx
 
-# Download bilingual zh-en streaming model
-RUN wget https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2 && \
-    tar xvf sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2 && \
-    rm sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20.tar.bz2
+# Download FireRed ASR2 bilingual zh-en model (int8 quantised)
+RUN wget https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-fire-red-asr2-zh_en-int8-2026-02-26.tar.bz2 && \
+    tar xvf sherpa-onnx-fire-red-asr2-zh_en-int8-2026-02-26.tar.bz2 && \
+    rm sherpa-onnx-fire-red-asr2-zh_en-int8-2026-02-26.tar.bz2
+
+# Download Silero VAD model
+RUN wget https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/silero_vad.onnx
 
 RUN pip3 install --no-cache-dir \
     numpy \

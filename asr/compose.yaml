@@ -23,7 +23,8 @@ services:
       # "cuda" uses the GPU-enabled ONNX runtime; set to "cpu" if no GPU
       - ASR_PROVIDER=cuda
       - ASR_THREADS=4
-      - MODEL_DIR=/opt/sherpa-onnx/sherpa-onnx-streaming-zipformer-bilingual-zh-en-2023-02-20
+      - MODEL_DIR=/opt/sherpa-onnx/sherpa-onnx-fire-red-asr2-zh_en-int8-2026-02-26
+      - VAD_MODEL=/opt/sherpa-onnx/silero_vad.onnx
 
     volumes:
       # Mount a local directory to drop test audio files into
