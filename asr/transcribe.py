@@ -38,8 +38,7 @@ class Transcriber:
         stream = self._rec.create_stream()
         stream.accept_waveform(16000, samples)
         self._rec.decode_stream(stream)
-        result = self._rec.get_result(stream)
-        return result.text.strip()
+        return stream.result.text.strip()
 
 
 def _read_wav(path: str) -> np.ndarray:
