@@ -24,18 +24,12 @@ N_THREADS = int(os.getenv("ASR_THREADS", "4"))
 
 class Transcriber:
     def __init__(self) -> None:
-        self._rec = sherpa_onnx.OfflineRecognizer(
-            sherpa_onnx.OfflineRecognizerConfig(
-                model_config=sherpa_onnx.OfflineModelConfig(
-                    fire_red_asr=sherpa_onnx.OfflineFireRedAsrModelConfig(
-                        encoder=f"{MODEL_DIR}/encoder.int8.onnx",
-                        decoder=f"{MODEL_DIR}/decoder.int8.onnx",
-                    ),
-                    tokens=f"{MODEL_DIR}/tokens.txt",
-                    num_threads=N_THREADS,
-                    provider=PROVIDER,
-                ),
-            )
+        self._rec = sherpa_onnx.OfflineRecognizer.from_fire_red_asr(
+            encoder=f"{MODEL_DIR}/encoder.int8.onnx",
+            decoder=f"{MODEL_DIR}/decoder.int8.onnx",
+            tokens=f"{MODEL_DIR}/tokens.txt",
+            num_threads=N_THREADS,
+            provider=PROVIDER,
         )
 
     def transcribe(self, wav_path: str) -> str:
@@ -44,7 +38,8 @@ class Transcriber:
         stream = self._rec.create_stream()
         stream.accept_waveform(16000, samples)
         self._rec.decode_stream(stream)
-        return stream.result.text.strip()
+        result = self._rec.get_result(stream)
+        return result.text.strip()
 
 
 def _read_wav(path: str) -> np.ndarray:
