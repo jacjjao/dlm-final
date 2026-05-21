@@ -26,7 +26,7 @@ class Transcriber:
     def __init__(self) -> None:
         self._rec = sherpa_onnx.OfflineRecognizer(
             sherpa_onnx.OfflineRecognizerConfig(
-                model=sherpa_onnx.OfflineModelConfig(
+                model_config=sherpa_onnx.OfflineModelConfig(
                     fire_red_asr=sherpa_onnx.OfflineFireRedAsrModelConfig(
                         encoder=f"{MODEL_DIR}/encoder.int8.onnx",
                         decoder=f"{MODEL_DIR}/decoder.int8.onnx",
