@@ -1,33 +1,23 @@
 export class Editor {
-  private readonly _codeEl: HTMLElement;
-  private readonly _placeholderEl: HTMLElement;
-  private _code: string = '';
+  private readonly _el: HTMLTextAreaElement;
 
-  constructor(codeEl: HTMLElement, placeholderEl: HTMLElement) {
-    this._codeEl = codeEl;
-    this._placeholderEl = placeholderEl;
+  constructor(el: HTMLTextAreaElement) {
+    this._el = el;
   }
 
   setCode(code: string): void {
-    this._code = code;
-    this._codeEl.removeAttribute('data-highlighted');
-    this._codeEl.textContent = code;
-    hljs.highlightElement(this._codeEl);
-    this._placeholderEl.style.display = 'none';
+    this._el.value = code;
   }
 
   getCode(): string {
-    return this._code;
+    return this._el.value;
   }
 
   clear(): void {
-    this._code = '';
-    this._codeEl.removeAttribute('data-highlighted');
-    this._codeEl.textContent = '';
-    this._placeholderEl.style.display = '';
+    this._el.value = '';
   }
 
   isEmpty(): boolean {
-    return this._code.trim().length === 0;
+    return this._el.value.trim().length === 0;
   }
 }

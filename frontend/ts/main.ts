@@ -48,12 +48,10 @@ const debugLabel            = getElement<HTMLSpanElement>('debug-label');
 
 // ─── Modules ───────────────────────────────────────────────────────────────
 
-const recorder = new Recorder();
-const editor   = new Editor(
-  getElement<HTMLElement>('code-display'),
-  getElement<HTMLElement>('editor-placeholder'),
-);
-const tts = new TTS();
+const recorder   = new Recorder();
+const codeEditor = getElement<HTMLTextAreaElement>('code-editor');
+const editor     = new Editor(codeEditor);
+const tts        = new TTS();
 
 // ─── State ─────────────────────────────────────────────────────────────────
 
@@ -333,6 +331,22 @@ clearBtn.addEventListener('click', () => {
 });
 
 clearTerminalBtn.addEventListener('click', clearTerminal);
+
+codeEditor.addEventListener('input', () => {
+  const hasCode = !editor.isEmpty();
+  copyBtn.disabled  = !hasCode;
+  clearBtn.disabled = !hasCode;
+  runBtn.disabled   = !hasCode;
+});
+
+codeEditor.addEventListener('keydown', (e: KeyboardEvent) => {
+  if (e.key !== 'Tab') return;
+  e.preventDefault();
+  const start = codeEditor.selectionStart;
+  const end   = codeEditor.selectionEnd;
+  codeEditor.value = codeEditor.value.slice(0, start) + '    ' + codeEditor.value.slice(end);
+  codeEditor.selectionStart = codeEditor.selectionEnd = start + 4;
+});
 
 // ─── Keyboard shortcuts ────────────────────────────────────────────────────
 

@@ -1,3 +1,1 @@
-declare const hljs: {
-  highlightElement(element: HTMLElement): void;
-};
+// No CDN globals currently required.

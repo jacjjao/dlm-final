@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VocalCode</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -50,16 +49,15 @@
         </div>
       </div>
       <div class="editor-scroll">
-        <pre id="code-pre"><code id="code-display" class="language-python"></code></pre>
-        <div id="editor-placeholder" class="editor-placeholder" aria-hidden="true">
-          <div class="placeholder-icon" aria-hidden="true">🎤</div>
-          <p>Record a voice command to generate Python code</p>
-          <p class="hint">
-            <kbd>R</kbd> Record &nbsp;·&nbsp;
-            <kbd>Space</kbd> Run &nbsp;·&nbsp;
-            <kbd>M</kbd> Mute
-          </p>
-        </div>
+        <textarea
+          id="code-editor"
+          spellcheck="false"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          aria-label="Python code editor"
+          placeholder="Record a voice command to generate Python code...&#10;&#10;  R  Record    Space  Run    M  Mute"
+        ></textarea>
       </div>
     </section>
 
@@ -67,7 +65,7 @@
     <section class="panel terminal-panel" aria-label="Terminal output">
       <div class="panel-header">
         <span class="panel-title">
-          <span aria-hidden="true">⬛</span> Terminal
+          <span aria-hidden="true">⬛</span> Output
         </span>
         <button id="clear-terminal-btn" class="panel-btn" aria-label="Clear terminal output">Clear</button>
       </div>
@@ -117,7 +115,6 @@
     <span id="debug-label">Fixing error...</span>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
