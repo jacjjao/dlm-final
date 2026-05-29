@@ -332,20 +332,11 @@ clearBtn.addEventListener('click', () => {
 
 clearTerminalBtn.addEventListener('click', clearTerminal);
 
-codeEditor.addEventListener('input', () => {
+editor.onChange(() => {
   const hasCode = !editor.isEmpty();
   copyBtn.disabled  = !hasCode;
   clearBtn.disabled = !hasCode;
   runBtn.disabled   = !hasCode;
-});
-
-codeEditor.addEventListener('keydown', (e: KeyboardEvent) => {
-  if (e.key !== 'Tab') return;
-  e.preventDefault();
-  const start = codeEditor.selectionStart;
-  const end   = codeEditor.selectionEnd;
-  codeEditor.value = codeEditor.value.slice(0, start) + '    ' + codeEditor.value.slice(end);
-  codeEditor.selectionStart = codeEditor.selectionEnd = start + 4;
 });
 
 // ─── Keyboard shortcuts ────────────────────────────────────────────────────

@@ -230,40 +230,32 @@ body {
   cursor: not-allowed;
 }
 
-/* ─── Code Editor ────────────────────────────────────────────────────────── */
+/* ─── Code Editor (CodeMirror) ───────────────────────────────────────────── */
 
 .editor-scroll {
   flex: 1;
   overflow: hidden;
   display: flex;
+  flex-direction: column;
 }
 
-#code-editor {
+/* Make the CodeMirror wrapper fill the flex container */
+.editor-scroll .CodeMirror {
   flex: 1;
-  width: 100%;
-  padding: 16px;
+  min-height: 0;
+  height: 100%;
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.6;
-  color: var(--text-primary);
   background: var(--bg-primary);
-  border: none;
-  outline: none;
-  resize: none;
-  tab-size: 4;
-  white-space: pre;
-  overflow-wrap: normal;
-  overflow: auto;
-  caret-color: var(--accent);
 }
 
-#code-editor::placeholder {
-  color: var(--text-muted);
-  font-family: var(--font-ui);
-  font-size: 13px;
-  font-style: italic;
-  white-space: pre-wrap;
+/* Match gutter to app's secondary background */
+.editor-scroll .CodeMirror-gutters {
+  background: var(--bg-secondary);
+  border-right-color: var(--border);
 }
+
 
 kbd {
   display: inline-block;
