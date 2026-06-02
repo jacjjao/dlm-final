@@ -39,6 +39,19 @@
   <!-- Main workspace -->
   <main class="workspace" role="main">
 
+    <!-- Chat panel -->
+    <section class="panel chat-panel" aria-label="Conversation history">
+      <div class="panel-header">
+        <span class="panel-title">
+          <span aria-hidden="true">💬</span> Chat
+        </span>
+        <button id="clear-chat-btn" class="panel-btn" aria-label="Clear chat history">Clear</button>
+      </div>
+      <div id="chat-messages" class="chat-scroll" aria-live="polite" aria-atomic="false" role="log">
+        <div class="chat-placeholder">Voice commands and AI responses will appear here...</div>
+      </div>
+    </section>
+
     <!-- Code editor panel -->
     <section class="panel editor-panel" aria-label="Code editor">
       <div class="panel-header">

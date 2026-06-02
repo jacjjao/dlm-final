@@ -36,9 +36,11 @@ const replayBtn             = getElement<HTMLButtonElement>('replay-btn');
 const copyBtn               = getElement<HTMLButtonElement>('copy-btn');
 const clearBtn              = getElement<HTMLButtonElement>('clear-btn');
 const clearTerminalBtn      = getElement<HTMLButtonElement>('clear-terminal-btn');
+const clearChatBtn          = getElement<HTMLButtonElement>('clear-chat-btn');
 const transcriptDisplay     = getElement<HTMLSpanElement>('transcript-display');
 const transcriptPlaceholder = getElement<HTMLSpanElement>('transcript-placeholder');
 const terminalOutput        = getElement<HTMLDivElement>('terminal-output');
+const chatMessages          = getElement<HTMLDivElement>('chat-messages');
 const statusText            = getElement<HTMLSpanElement>('status-text');
 const statusDot             = getElement<HTMLSpanElement>('status-dot');
 const statusLabel           = getElement<HTMLSpanElement>('status-label');
@@ -98,6 +100,34 @@ function appendTerminal(text: string, type: TerminalLineType = 'stdout'): void {
 function clearTerminal(): void {
   terminalOutput.innerHTML =
     '<div class="terminal-placeholder">Execution output will appear here...</div>';
+}
+
+// ─── Chat ──────────────────────────────────────────────────────────────────
+
+function appendChat(text: string, role: 'user' | 'assistant'): void {
+  const placeholder = chatMessages.querySelector('.chat-placeholder');
+  if (placeholder) placeholder.remove();
+
+  const msg = document.createElement('div');
+  msg.className = `chat-message ${role}`;
+
+  const label = document.createElement('div');
+  label.className = 'chat-label';
+  label.textContent = role === 'user' ? 'You' : 'AI';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble';
+  bubble.textContent = text;
+
+  msg.appendChild(label);
+  msg.appendChild(bubble);
+  chatMessages.appendChild(msg);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function clearChat(): void {
+  chatMessages.innerHTML =
+    '<div class="chat-placeholder">Voice commands and AI responses will appear here...</div>';
 }
 
 // ─── Toast ─────────────────────────────────────────────────────────────────
@@ -173,6 +203,7 @@ async function processAudio(audioBlob: Blob): Promise<void> {
   currentTranscript = text;
   transcriptDisplay.textContent = text;
   transcriptPlaceholder.style.display = 'none';
+  appendChat(text, 'user');
 
   setStatus('generating');
   const { code } = await api.generateCode(text);
@@ -181,6 +212,7 @@ async function processAudio(audioBlob: Blob): Promise<void> {
   copyBtn.disabled = false;
   clearBtn.disabled = false;
   runBtn.disabled = false;
+  appendChat('Code generated. Running now...', 'assistant');
 
   tts.speak('Code generated. Running now.');
 
@@ -230,6 +262,7 @@ async function attemptDebug(code: string, error: string): Promise<void> {
   editor.setCode(fixedCode);
   clearTerminal();
   appendTerminal(`[Auto-fix ${debugRetries}/${MAX_RETRIES}] ${explanation}`, 'info');
+  appendChat(`Auto-fix ${debugRetries}/${MAX_RETRIES}: ${explanation}`, 'assistant');
 
   const result = await api.executeCode(fixedCode);
 
@@ -331,6 +364,7 @@ clearBtn.addEventListener('click', () => {
 });
 
 clearTerminalBtn.addEventListener('click', clearTerminal);
+clearChatBtn.addEventListener('click', clearChat);
 
 editor.onChange(() => {
   const hasCode = !editor.isEmpty();
