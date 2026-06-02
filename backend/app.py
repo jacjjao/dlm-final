@@ -59,12 +59,14 @@ async def transcribe(audio: UploadFile = File(...)):
 async def generate(req: GenerateRequest):
     """Generate Python code from a natural-language transcript via Ollama."""
     try:
-        code = await asyncio.to_thread(_generate_code, req.transcript)
+        response_type, content = await asyncio.to_thread(_generate_code, req.transcript)
     except RuntimeError as exc:
         raise HTTPException(503, detail=str(exc)) from exc
     except Exception as exc:
         raise HTTPException(500, detail=str(exc)) from exc
-    return {"code": code}
+    if response_type == "chat":
+        return {"type": "chat", "code": "", "reply": content}
+    return {"type": "code", "code": content, "reply": ""}
 
 
 @app.post("/execute")

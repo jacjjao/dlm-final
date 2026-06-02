@@ -206,9 +206,17 @@ async function processAudio(audioBlob: Blob): Promise<void> {
   appendChat(text, 'user');
 
   setStatus('generating');
-  const { code } = await api.generateCode(text);
+  const result = await api.generateCode(text);
 
-  editor.setCode(code);
+  if (result.type === 'chat') {
+    appendChat(result.reply, 'assistant');
+    tts.speak(result.reply);
+    setStatus('done');
+    replayBtn.disabled = false;
+    return;
+  }
+
+  editor.setCode(result.code);
   copyBtn.disabled = false;
   clearBtn.disabled = false;
   runBtn.disabled = false;
@@ -216,7 +224,7 @@ async function processAudio(audioBlob: Blob): Promise<void> {
 
   tts.speak('Code generated. Running now.');
 
-  await runCode(code);
+  await runCode(result.code);
 }
 
 async function runCode(code: string): Promise<void> {

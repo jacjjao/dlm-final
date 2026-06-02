@@ -5,7 +5,9 @@ export interface TranscribeResponse {
 }
 
 export interface GenerateResponse {
+  type: 'code' | 'chat';
   code: string;
+  reply: string;
 }
 
 export interface ExecuteResponse {

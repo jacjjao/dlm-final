@@ -13,11 +13,16 @@ OLLAMA_HOST  = os.getenv("OLLAMA_HOST",  "http://localhost:11434")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5-coder:7b")
 
 _GENERATE_SYSTEM = (
-    "You are an expert Python developer. "
-    "The user will describe what they want in Mandarin, English, or a mix of both. "
-    "Generate ONLY syntactically correct, runnable Python code. "
-    "Do NOT include any explanation, markdown formatting, or code fences. "
-    "Output pure Python code only."
+    "You are an expert Python developer assistant. "
+    "The user will speak in Mandarin, English, or a mix of both. "
+    "Always start your response with exactly one of these two tags on its own line:\n"
+    "TYPE:CODE\n"
+    "TYPE:CHAT\n\n"
+    "Use TYPE:CODE when the user asks you to write, generate, or create code. "
+    "After the tag, output ONLY pure Python code — no markdown fences, no explanations.\n\n"
+    "Use TYPE:CHAT when the user is asking a question, requesting an explanation, "
+    "or having a conversation that does not require writing new code. "
+    "After the tag, answer naturally in the same language the user used."
 )
 
 _DEBUG_SYSTEM = (
@@ -52,7 +57,8 @@ def _parse_debug(text: str) -> tuple[str, str]:
     return code, explanation
 
 
-def generate_code(transcript: str) -> str:
+def generate_code(transcript: str) -> tuple[str, str]:
+    """Return (response_type, content) where response_type is 'code' or 'chat'."""
     try:
         resp = _client().chat(
             model=OLLAMA_MODEL,
@@ -68,8 +74,14 @@ def generate_code(transcript: str) -> str:
             f"Detail: {exc}"
         ) from exc
 
-    raw = resp.message.content
-    return _strip_fences(raw)
+    raw = resp.message.content.strip()
+    if raw.startswith("TYPE:CHAT"):
+        content = raw[len("TYPE:CHAT"):].strip()
+        return "chat", content
+    if raw.startswith("TYPE:CODE"):
+        content = raw[len("TYPE:CODE"):].strip()
+        return "code", _strip_fences(content)
+    return "code", _strip_fences(raw)
 
 
 def debug_code(code: str, error: str, transcript: str) -> tuple[str, str]:

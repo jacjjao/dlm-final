@@ -6,7 +6,9 @@ class GenerateRequest(BaseModel):
 
 
 class GenerateResponse(BaseModel):
-    code: str
+    type: str   # "code" | "chat"
+    code: str   # non-empty when type == "code"
+    reply: str  # non-empty when type == "chat"
 
 
 class ExecuteRequest(BaseModel):
